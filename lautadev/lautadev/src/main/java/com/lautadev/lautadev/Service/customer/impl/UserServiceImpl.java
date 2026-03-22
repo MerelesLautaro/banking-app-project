@@ -8,6 +8,8 @@ import com.lautadev.lautadev.Exception.ApiException;
 import com.lautadev.lautadev.Repositories.UserRepository;
 import com.lautadev.lautadev.Service.customer.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final UserRepository userRepository;
@@ -26,10 +29,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                .orElseThrow(ApiException::userNotFound);
+                .orElseThrow(() ->
+                        new ApiException("User not found for the given identifier: " + username,
+                                new UsernameNotFoundException(username), HttpStatus.BAD_REQUEST));
     }
 
     @Override
+    @Transactional
     public UserDetailsResponse getLoggedInUserDetails() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -39,7 +45,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
         User user = (User) authentication.getPrincipal();
         if (user == null) {
-            throw ApiException.authMissing();
+            throw ApiException.userNotFound();
         }
 
         if (user.getAccounts() == null || user.getAccounts().isEmpty()) {

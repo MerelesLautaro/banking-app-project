@@ -2,7 +2,6 @@ package com.lautadev.lautadev.Security;
 
 import com.lautadev.lautadev.Exception.ApiException;
 import com.lautadev.lautadev.Service.authentication.TokenService;
-import com.lautadev.lautadev.Util.Constants;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +21,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+
+import static com.lautadev.lautadev.Util.Constants.UNPROTECTED_PATHS;
 
 
 @Component
@@ -49,8 +50,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String uri = request.getRequestURI();
-        boolean isUnprotectedPath = Constants.UNPROTECTED_PATHS.stream().anyMatch(uri::startsWith);
+        String uri = request.getRequestURI().replaceFirst("/", "");
+        boolean isUnprotectedPath = UNPROTECTED_PATHS.contains(uri) || uri.startsWith("health") ;
 
         if (isUnprotectedPath) {
             doFilter(request, response, filterChain);
@@ -66,7 +67,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 throw ApiException.accessDenied();
             }
 
-            final String token = authHeaderValue.substring(authPrefix.length());
+            if (!authHeaderValue.startsWith("Bearer ")) {
+                throw ApiException.accessDenied();
+            }
+
+            final String token = authHeaderValue.substring(7); // "Bearer ".length() = 7
             final String userEmail = tokenService.extractUsername(token);
 
             Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();

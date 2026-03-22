@@ -42,14 +42,11 @@ public class AccountServiceImpl implements AccountService {
                 .user(user)
                 .build();
 
-        Account savedAccount = accountRepository.save(account);
-
-        log.warn("💾 Account saved: {} type: {}", savedAccount.getAccountId(), savedAccount.getAccountType());
-
-        return savedAccount;
+        return accountRepository.save(account);
     }
 
     @Override
+    @Transactional
     public AccountDetailResponse getLoggedInUserAccount() {
         Account account = getUserAccount();
         return new AccountDetailResponse(account.getAccountId(), account.getBalance().stripTrailingZeros(), account.getAccountType());

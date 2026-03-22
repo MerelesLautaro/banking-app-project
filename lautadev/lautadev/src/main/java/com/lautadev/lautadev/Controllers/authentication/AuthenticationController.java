@@ -31,7 +31,6 @@ public class AuthenticationController {
     public ResponseEntity<Token> login(@RequestBody @Valid
                                        LoginRequest loginRequest) {
 
-
         return ResponseEntity.ok(authenticationService.login(loginRequest));
     }
 
