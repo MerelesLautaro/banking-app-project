@@ -27,7 +27,7 @@ public class SecurityFilterChainConfig {
                         sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/users/register", "/api/users/login","/health").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

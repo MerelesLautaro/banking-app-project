@@ -42,4 +42,9 @@ public class ApiException extends RuntimeException{
         return new ApiException("Access Denied", HttpStatus.UNAUTHORIZED);
     }
 
+    // Transactions
+    public static ApiException insufficientBalance() {
+        return new ApiException("Insufficient balance", HttpStatus.UNAUTHORIZED);
+    }
+
 }

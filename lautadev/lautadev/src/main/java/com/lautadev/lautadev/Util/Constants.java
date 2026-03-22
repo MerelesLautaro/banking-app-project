@@ -8,9 +8,9 @@ public class Constants {
     }
 
     public static final Set<String> UNPROTECTED_PATHS = Set.of(
-            "/api/users/register",
-            "/api/users/login",
-            "/health"
+            "api/users/register",
+            "api/users/login",
+            "health"
     );
 }
 
