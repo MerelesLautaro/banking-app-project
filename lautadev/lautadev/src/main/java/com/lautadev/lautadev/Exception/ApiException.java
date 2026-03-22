@@ -36,6 +36,8 @@ public class ApiException extends RuntimeException{
 
     public static ApiException accountIndexError() { return new ApiException("Account index error or invalid format", HttpStatus.BAD_REQUEST);}
 
+    public static ApiException accountIndexOutOfBounds() { return new ApiException("Account index out of bounds", HttpStatus.BAD_REQUEST);}
+
     public static ApiException accessDenied() {
         return new ApiException("Access Denied", HttpStatus.UNAUTHORIZED);
     }

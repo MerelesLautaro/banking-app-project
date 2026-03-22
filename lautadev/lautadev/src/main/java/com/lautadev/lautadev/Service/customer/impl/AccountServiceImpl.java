@@ -53,7 +53,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDetailResponse getAccountByIndex(User user, String accountIndex) {
+    public AccountDetailResponse getAccountByIndex(String accountIndex) {
+        User user = this.getLoggedInUser();
+
         String indexPart = accountIndex.replaceAll("[^0-9]", "");
         String accountTypePart = accountIndex.replaceAll("[0-9]", "");
 
@@ -73,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (index < 0 || index >= accounts.size()) {
-            throw ApiException.accountIndexError();
+            throw ApiException.accountIndexOutOfBounds();
         }
 
         Account account = accounts.get(index);

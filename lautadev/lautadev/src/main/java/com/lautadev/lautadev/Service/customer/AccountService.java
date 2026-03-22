@@ -10,6 +10,6 @@ public interface AccountService {
     Account createAccount(User user);
     // void createNewAccount(User user, String accountType, String accountNumber);
     AccountDetailResponse getLoggedInUserAccount();
-    AccountDetailResponse getAccountByIndex(User user, String accountIndex);
+    AccountDetailResponse getAccountByIndex(String accountIndex);
     Account getUserAccount();
 }
