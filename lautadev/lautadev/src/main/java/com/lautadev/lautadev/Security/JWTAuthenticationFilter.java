@@ -50,8 +50,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        log.warn("Llame a helath");
-
         String uri = request.getRequestURI().replaceFirst("/", "");
         boolean isUnprotectedPath = UNPROTECTED_PATHS.contains(uri) || uri.startsWith("health") ;
 

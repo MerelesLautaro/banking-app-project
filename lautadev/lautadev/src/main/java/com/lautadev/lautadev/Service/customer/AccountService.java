@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AccountService {
     Account createAccount(User user);
-    // void createNewAccount(User user, String accountType, String accountNumber);
+    void createNewAccount(String accountType, String accountNumber);
     AccountDetailResponse getLoggedInUserAccount();
     AccountDetailResponse getAccountByIndex(String accountIndex);
     Account getUserAccount();

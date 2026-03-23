@@ -1,10 +1,11 @@
 package com.lautadev.lautadev.Controllers.transaction;
 
 import com.lautadev.lautadev.DTO.GenericResponse;
+import com.lautadev.lautadev.DTO.request.authentication.CreateAccountRequest;
 import com.lautadev.lautadev.DTO.request.transaction.TransactionRequest;
 import com.lautadev.lautadev.DTO.request.transaction.TransferRequest;
 import com.lautadev.lautadev.DTO.response.transaction.TransactionDetail;
-import com.lautadev.lautadev.Repositories.AccountRepository;
+import com.lautadev.lautadev.Service.customer.AccountService;
 import com.lautadev.lautadev.Service.transaction.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,14 @@ import java.util.List;
 public class AccountController {
 
     private final TransactionService transactionService;
+    private final AccountService accountService;
 
+
+    @PostMapping("/create")
+    public ResponseEntity<String> createNewAccount(@Valid @RequestBody CreateAccountRequest request) {
+        accountService.createNewAccount(request.accountType() , request.accountNumber());
+        return ResponseEntity.ok("New account added successfully for user");
+    }
 
     @PostMapping("/deposit")
     public ResponseEntity<GenericResponse> depositMoney(@Valid @RequestBody TransactionRequest transactionRequest) {

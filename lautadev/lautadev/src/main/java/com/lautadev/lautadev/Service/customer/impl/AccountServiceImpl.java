@@ -7,8 +7,10 @@ import com.lautadev.lautadev.Entities.User;
 import com.lautadev.lautadev.Exception.ApiException;
 import com.lautadev.lautadev.Repositories.AccountRepository;
 import com.lautadev.lautadev.Service.customer.AccountService;
+import com.lautadev.lautadev.Service.transaction.impl.InterestServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +29,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final InterestServiceImpl interestService;
 
     @Override
     @Transactional
@@ -43,6 +46,37 @@ public class AccountServiceImpl implements AccountService {
                 .build();
 
         return accountRepository.save(account);
+    }
+
+    @Override
+    @Transactional
+    public void createNewAccount(String accountType, String accountNumber) {
+        User user = this.getLoggedInUser();
+
+        Account mainAccount = accountRepository.findByAccountIdAndUser(accountNumber, user)
+                .orElseThrow(() -> new ApiException("Main account not found or does not belong to the user", HttpStatus.BAD_REQUEST));
+
+        if (!mainAccount.getAccountType().equals(AccountType.Main)) {
+            throw new ApiException("The referenced account is not of type Main", HttpStatus.BAD_REQUEST);
+        }
+
+        if (AccountType.valueOf(accountType).equals(AccountType.Invest)) {
+            boolean hasInvestAccount = accountRepository.existsByUserAndAccountType(user, AccountType.Invest);
+            if (hasInvestAccount) {
+                throw new ApiException("The user already has an Invest account", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        String accountId = UUID.randomUUID().toString();
+        Account newAccount = Account.builder()
+                .accountId(accountId)
+                .balance(BigDecimal.ZERO)
+                .accountType(AccountType.valueOf(accountType))
+                .user(user)
+                .build();
+
+        accountRepository.save(newAccount);
+        interestService.startInterestTask(user);
     }
 
     @Override
